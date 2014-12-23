@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+#
+# A quick music shuffle script; all it does is recurse into
+#   directories at random until it finds a file that
+#   isn't a directory and then it opens firefox on
+#   that file.
+# Why? I use this in my music directory subsystem to
+#   implement a ``shuffle'' feature.
+# Oh, and I use Fyre Fawkes because I like the
+#   WEBM format. Also, electronica and punk both 
+#   sound better at 1.5x speed.
+#
+
+cd ~/av/music
+CUR=.
+while [ -d "$CUR" ]
+do
+  files="$(ls -1)"
+  total="$(echo "$files"|wc -l)"
+  if [ "$total" -eq 0 ]
+  then
+    echo "What? Empty dir? The FUCK?!"
+    exit 1
+  fi
+  # index="$((RANDOM % $(ls -1|wc -l) + 1))" # also worx
+  index="$((RANDOM % total + 1))"
+  file="$(echo "$files" | head -n $index | tail -n 1)"
+  echo "$file"
+  if [ -d "$file" ]
+  then
+    cd "$file"
+  else
+    # Why the error redirection?
+    # Because otherwise you'll have to deal
+    #  with annoying firefox bugs' error
+    #  output. Seriously. Firefox is buggy.
+    (firefox "$file" 2>&1) > /dev/null & 
+    exit 0
+  fi
+done
+
+
